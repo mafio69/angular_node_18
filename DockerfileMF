@@ -1,0 +1,17 @@
+FROM node:18-bullseye as build
+WORKDIR /apps
+COPY Main .
+RUN npm install
+COPY ./Main /apps
+ARG configuration=development
+RUN npm run build --outputPath=./dist/public --configuration $configuration
+# Stage 2, use the compiled app, ready for production with Nginx
+FROM nginx:alpine-slim
+COPY /nginx-custom.conf /etc/nginx/conf.d/
+RUN rm -rf /usr/share/nginx/html/*
+COPY --from=build /apps/dist/public/ /usr/share/nginx/html
+# Copy the EntryPoint
+COPY entrypoint.sh /
+RUN chmod +x entrypoint.sh
+ENTRYPOINT ["sh","/entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]

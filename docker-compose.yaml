@@ -1,0 +1,11 @@
+version: '3'
+services:
+  angular2:
+    build:
+      context: .
+      dockerfile: DockerfileMF
+    ports:
+      - "4201:80"
+    container_name: angular-ui
+    volumes:
+      - ./Main/src:/usr/share/nginx/html
